@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 /**
  * Created by Howard on 11/13/2017.
@@ -45,11 +46,23 @@ public class RecordingService extends IntentService {
     static final public String TIME_MESSAGE = "TIME_MESSAGE";
     static final public String TIME_RESULT = "TIME_RESULT";
 
+    private TensorFlowInferenceInterface inferenceInterface;
+    private static final String MODEL_FILE = "file:///android_asset/optimized_ambient_nn.pb";
+    private static final String INPUT_NODE = "first";
+    private static final String OUTPUT_NODE = "output";
+    private static final long[] INPUT_SIZE = {1,3};
+
+    static {
+        System.loadLibrary("tensorflow_inference");
+    }
+
     public RecordingService() {
         super("RecordingService");
         bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING)*3;
         audioData = new short [bufferSize]; //short array that pcm data is put into.
         broadcaster = LocalBroadcastManager.getInstance(this);
+        inferenceInterface = new TensorFlowInferenceInterface(getAssets(), MODEL_FILE);
+
         Log.d(TAG, "Constructing recording service");
     }
 
@@ -191,6 +204,17 @@ public class RecordingService extends IntentService {
 
             in.close();
             out.close();
+
+            // read the saved wav file here, process the audio into features, and build the input node using those features to pass into the tensorflow model
+
+//            // tensorflow part example
+//            float[] inputFloats = {0.1f, 0.2f, 0.3f};
+//            inferenceInterface.feed(INPUT_NODE, inputFloats, INPUT_SIZE);
+//            inferenceInterface.run(new String[] {OUTPUT_NODE});
+//            float[] floatValues = {0, 0};
+//            inferenceInterface.fetch(OUTPUT_NODE, floatValues);
+//            // floatValues should contain the result of the prediction
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

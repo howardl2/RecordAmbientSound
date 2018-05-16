@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -34,22 +33,11 @@ public class MainActivity extends AppCompatActivity {
 
     private String prevTimeText;
 
-    private TensorFlowInferenceInterface inferenceInterface;
-    private static final String MODEL_FILE = "file:///android_asset/optimized_ambient_nn.pb";
-    private static final String INPUT_NODE = "first";
-    private static final String OUTPUT_NODE = "output";
-    private static final int[] INPUT_SIZE = {1,3};
-
-    static {
-        System.loadLibrary("tensorflow_inference");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        inferenceInterface = new TensorFlowInferenceInterface(getAssets(), MODEL_FILE);
 
 
         String[] PERMISSIONS = {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
